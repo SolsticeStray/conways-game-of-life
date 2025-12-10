@@ -1,0 +1,21 @@
+# =============== Visual Studio ===============
+*.exe
+*.obj
+*.o
+*.ilk
+*.pdb
+*.ipch
+*.sdf
+Debug/
+Release/
+.vs/
+ipch/
+
+# =============== CLion / CMake ===============
+cmake-build-*/
+CMakeLists.txt.user
+.idea/
+
+# =============== 其他 ===============
+.DS_Store
+*.swp
