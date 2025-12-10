@@ -3,15 +3,9 @@ project(conways_game_of_life C)
 
 set(CMAKE_C_STANDARD 99)
 
-# 列出所有源文件（后面大家加新文件要在这里补上！）
+# 只包含 main.c（其他文件等合并后再加）
 add_executable(conways_game_of_life
-    main.c
-    core.c
-    input.c
-    render.c
+        main.c
 )
 
-# Windows 下链接 EasyX 所需的库
-if(WIN32)
-    target_link_libraries(conways_game_of_life gdi32)
-endif()
+target_link_libraries(conways_game_of_life gdi32 winmm)
