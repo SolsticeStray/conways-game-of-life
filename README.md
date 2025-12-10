@@ -1,10 +1,13 @@
-# 康威的生命游戏 (Conway's Game of Life)
+# 🧬 康威生命游戏（Conway's Game of Life）
 
-NJU 大一智能C语言程序设计期末项目
-基于 EasyX 图形库
-支持 GUI 交互与读存档功能
+> 基于 C 语言 + EasyX 实现的经典细胞自动机模拟器  
+> 支持鼠标交互、实时控制、存档读档与配置自定义
 
-## ✨ Feature
+![demo](demo.png)
+
+---
+
+## 🎮 功能说明
 
 ### 🖱️ 鼠标交互
 - 点击任意格子切换细胞生死状态
@@ -21,31 +24,30 @@ NJU 大一智能C语言程序设计期末项目
 ### ⚙️ 配置文件
 - 通过 `config.ini` 自定义窗口大小、网格密度、演化速度等参数
 
-## 🛠️ 运行与编译
+---
 
-1. 安装 [Visual Studio 2019/2022](https://visualstudio.microsoft.com/)（社区版免费）
-2. 安装 [EasyX 图形库](https://easyx.cn/)（一键安装，自动集成到 VS）
+## 🏗️ 架构设计
 
-### 打开项目
-- **Visual Studio 用户**：  
-  `文件 → 打开 → 文件夹` → 选择本项目根目录  
-  右键 `main.c` → “设为启动项” → 按 F5 运行
+本项目采用**模块化设计**，各功能解耦，便于协作开发与维护。
 
-- **CLion 用户（Windows）**：  
-  直接打开项目文件夹，CMake 会自动配置（需确保已装 EasyX）
+### 技术栈
+- 语言：C
+- 图形库：EasyX（Windows）
+- 构建系统：CMake
+- 协作平台：GitHub + Git 分支管理
 
-> ⚠️ 注意：EasyX 仅支持 Windows。Mac/Linux 用户可编译但无法显示图形。
+### 模块划分
+| 模块 | 文件 | 职责 |
+|------|------|------|
+| 主控系统 | `main.c` | 初始化图形界面、主循环、协调各模块调用 |
+| 核心算法 | `core.c` | 实现生命演化规则（邻居计算、状态更新） |
+| 用户输入 | `input.c` | 处理鼠标点击与键盘事件 |
+| 图形渲染 | `render.c` | 绘制网格、细胞状态与 UI |
 
-## 🧩项目结构
-
-```text
-conways-game-of-life/
-├── .gitignore              # Git 忽略规则（忽略 VS/CLion 临时文件）
-├── README.md               # 项目说明文档
-├── CMakeLists.txt          # 跨平台构建配置
-├── config.ini              # 游戏配置文件
-├── main.c                  # 主程序入口
-├── core.c                  # 核心算法
-├── input.c                 # 用户交互（鼠标/键盘）
-├── render.c                # 图形渲染
-└── demo.png                # 程序运行截图
+### 全局状态（定义于 `main.c`）
+所有模块通过以下共享变量协同工作：
+```c
+int grid[100][100];   // 细胞状态：1=活，0=死
+int GRID_ROWS;        // 网格行数（从 config.ini 读取）
+int GRID_COLS;        // 网格列数
+int paused;           // 是否暂停（0=运行，1=暂停）
