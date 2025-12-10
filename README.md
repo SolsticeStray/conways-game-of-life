@@ -44,6 +44,12 @@
 | 用户输入 | `input.c` | 处理鼠标点击与键盘事件 |
 | 图形渲染 | `render.c` | 绘制网格、细胞状态与 UI |
 
+### 接口约定
+// 所有函数无参数、无返回值
+void nextGeneration();  // core.c
+void handleInput();     // input.c
+void render();          // render.c
+
 ### 全局状态（定义于 `main.c`）
 所有模块通过以下共享变量协同工作：
 ```c
