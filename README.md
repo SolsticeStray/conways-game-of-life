@@ -28,7 +28,7 @@
 |------|------|--------|
 | `main.c` | 主循环、存档、配置 | Solstice |
 | `core.c` | 生命演化逻辑 | snow |
-| `input.c` | 鼠标/键盘处理 | 成员B |
+| `input.c` | 鼠标/键盘处理 | Flynn |
 | `render.c` | 图形绘制 | James |
 
 ### 全局状态（仅在 `main.c` 定义）
