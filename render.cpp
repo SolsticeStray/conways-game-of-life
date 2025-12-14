@@ -1,5 +1,5 @@
 // render.cpp
-// 图形渲染模块
+// 渲染模块
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -18,7 +18,7 @@
 #define COLOR_CELL_ALIVE    RGB(0, 255, 150)
 #define COLOR_CELL_DEAD     RGB(45, 45, 55)
 #define COLOR_TEXT          RGB(200, 200, 220)
-#define COLOR_TITLE         RGB(255, 200, 50)      // 改名避免重复
+#define COLOR_TITLE         RGB(255, 200, 50)
 #define COLOR_BORDER        RGB(100, 100, 140)
 
 // 全局变量
@@ -31,7 +31,7 @@ static int g_frame_count = 0;
 static clock_t g_fps_update_time = 0;
 static clock_t g_last_frame_time = 0;
 
-// 初始化渲染系统
+// 初始化渲染模块
 void initRenderer(int rows, int cols) {
     g_grid_rows = rows;
     g_grid_cols = cols;
@@ -55,7 +55,7 @@ void initRenderer(int rows, int cols) {
     BeginBatchDraw();
 }
 
-// 关闭渲染系统
+// 关闭渲染模块
 void closeRenderer(void) {
     EndBatchDraw();
     closegraph();
@@ -70,7 +70,7 @@ void drawCell(int x, int y, int alive) {
         setfillcolor(COLOR_CELL_ALIVE);
         setlinecolor(RGB(0, 200, 120));
         fillroundrect(px + 2, py + 2, px + CELL_SIZE - 2, py + CELL_SIZE - 2, 4, 4);
-        // 高光效果
+        // 添加高光
         setfillcolor(RGB(100, 255, 200));
         solidcircle(px + CELL_SIZE / 3, py + CELL_SIZE / 3, 2);
     }
@@ -105,7 +105,7 @@ void drawGrid(void) {
         line(GRID_OFFSET_X, py, GRID_OFFSET_X + g_grid_cols * CELL_SIZE, py);
     }
 
-    // 绘制坐标轴标记
+    // 绘制坐标刻度
     settextcolor(RGB(120, 120, 150));
     settextstyle(12, 0, _T("Consolas"));
     TCHAR buf[16];
@@ -160,7 +160,7 @@ static void draw_ui_panel(int panel_x, int panel_y, int generation, int is_pause
     _stprintf_s(buf, 64, _T("Alive: %d"), live_count);
     outtextxy(panel_x + 15, panel_y + 85, buf);
 
-    // 状态显示
+    // 显示暂停状态
     if (is_paused) {
         settextcolor(RGB(255, 100, 100));
         outtextxy(panel_x + 15, panel_y + 120, _T("[ PAUSED ]"));
@@ -188,7 +188,7 @@ void render(int grid[][COLS], int rows, int cols, int generation, int is_paused)
     update_fps();
     drawGrid();
 
-    // 绘制所有细胞并统计活细胞数
+    // 绘制所有细胞并统计存活细胞数
     int live_count = 0;
     for (int y = 0; y < rows; y++) {
         for (int x = 0; x < cols; x++) {
