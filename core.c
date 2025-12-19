@@ -156,29 +156,31 @@ typedef struct {
 	int top, bottom, left, right;  // 四边活细胞数
 } EdgeCounts;
 EdgeCounts get_edge_counts(void) {
-	EdgeCounts counts = { 0, 0, 0, 0 };  // 一步初始化为0
+    EdgeCounts counts = { 0, 0, 0, 0 };
     /* 计算上边界（第0行） */
-	for (int j = 0; j < GRID_COLS; j++) {
-		counts.top += grid[0][j];
-	}
+    for (int j = 0; j < GRID_COLS; j++) {
+        counts.top += grid[0][j];
+    }
+    
     /* 计算下边界（最后一行） */
-	int last_row = GRID_ROWS - 1;
-	for (int j = 0; j < GRID_ROWS; j++) {
-		counts.bottom += grid[last_row][j];
-	}
+    int last_row = GRID_ROWS - 1;
+    for (int j = 0; j < GRID_COLS; j++) {
+        counts.bottom += grid[last_row][j];
+    }
+    
     /* 计算左边界（第0列） */
-	for (int i = 0; i < GRID_ROWS; i++) {
-		counts.left += grid[i][0];
-	}
+    for (int i = 0; i < GRID_ROWS; i++) {
+        counts.left += grid[i][0];
+    }
+    
     /* 计算右边界（最后一列） */
-	int last_col = GRID_COLS - 1;
-	for (int i = 0; i < GRID_ROWS; i++) {
-		counts.right += grid[i][last_col];
-	}
+    int last_col = GRID_COLS - 1;
+    for (int i = 0; i < GRID_ROWS; i++) {
+        counts.right += grid[i][last_col];
+    }
+    
     return counts;
 }
-
-
 
 
 
