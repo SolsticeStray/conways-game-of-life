@@ -1,6 +1,6 @@
-extern int grid[100][100];   // 1=»î, 0=ËÀ
+extern int grid[100][100];   // 1=æ´», 0=æ­»
 extern int GRID_ROWS, GRID_COLS;
-extern int paused;           // 0=ÔËĞĞ, 1=ÔİÍ£
+extern int paused;           // 0=è¿è¡Œ, 1=æš‚åœ
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -9,7 +9,7 @@ extern int paused;           // 0=ÔËĞĞ, 1=ÔİÍ£
 #define BOUNDARY_FIXED 0
 #define BOUNDARY_TOROIDAL 1
 int boundary_type = BOUNDARY_FIXED;
-void set_boundary_type(int type) {               //ÓÃÀ´ÉèÖÃ±ß½ç´¦Àí¹æÔò£¬ÊÇ»·ĞÎ´¦Àí»¹ÊÇ¿Õ°×´¦Àí£¨Á½ÖÖ´¦Àí·½Ê½ÊµÏÖĞ§¹û²»Í¬£©
+void set_boundary_type(int type) {               //ç”¨æ¥è®¾ç½®è¾¹ç•Œå¤„ç†è§„åˆ™ï¼Œæ˜¯ç¯å½¢å¤„ç†è¿˜æ˜¯ç©ºç™½å¤„ç†ï¼ˆä¸¤ç§å¤„ç†æ–¹å¼å®ç°æ•ˆæœä¸åŒï¼‰
 	if (type == BOUNDARY_FIXED || type == BOUNDARY_TOROIDAL) {
 		boundary_type = type;
 		return 1;
@@ -18,8 +18,8 @@ void set_boundary_type(int type) {               //ÓÃÀ´ÉèÖÃ±ß½ç´¦Àí¹æÔò£¬ÊÇ»·ĞÎ´
 }
 int get_boundary_type(void) {
 	return boundary_type;
-}                                               //ÓÃÀ´ÏÔÊ¾±ß½ç´¦Àí¹æÔò£¬¸üÇåÎúµØÈÃÓÃ»§ÇĞ»»
-int count_live_neighbours(int row, int col) {                        //¼ÆËãÒ»¸öÏ¸°ûÁÚ¾ÓÓĞ¼¸¸ö»î×ÅµÄ
+}                                               //ç”¨æ¥æ˜¾ç¤ºè¾¹ç•Œå¤„ç†è§„åˆ™ï¼Œæ›´æ¸…æ™°åœ°è®©ç”¨æˆ·åˆ‡æ¢
+int count_live_neighbours(int row, int col) {                        //è®¡ç®—ä¸€ä¸ªç»†èƒé‚»å±…æœ‰å‡ ä¸ªæ´»ç€çš„
 	int i, j, count = 0;
 	for (i = -1; i <= 1; i++) {
 		for (j = -1; j <= 1; j++) {
@@ -42,7 +42,7 @@ int count_live_neighbours(int row, int col) {                        //¼ÆËãÒ»¸öÏ
 	}
 	return count;
 }
-void  next_Generation() {                        //Éú³ÉÏÂÒ»´úÏ¸°û£¬²¢´æ´¢ÔÚÒ»¸öĞÂ¿ª±ÙµÄÊı×éÖĞ
+void  next_Generation() {                        //ç”Ÿæˆä¸‹ä¸€ä»£ç»†èƒï¼Œå¹¶å­˜å‚¨åœ¨ä¸€ä¸ªæ–°å¼€è¾Ÿçš„æ•°ç»„ä¸­
 	if (paused)
 		return;
 	int next_grid[100][100] = { 0 };
@@ -65,17 +65,17 @@ void  next_Generation() {                        //Éú³ÉÏÂÒ»´úÏ¸°û£¬²¢´æ´¢ÔÚÒ»¸öĞ
 			}
 		}
 	}
-	for (x = 0; x < GRID_ROWS; x++) {                               //¸üĞÂĞÂÒ»´úÏ¸°û
+	for (x = 0; x < GRID_ROWS; x++) {                               //æ›´æ–°æ–°ä¸€ä»£ç»†èƒ
 		for (y = 0; y < GRID_COLS; y++)
 			grid[x][y] = next_grid[x][y];
 	}
 }
-void restart_grid() {                                              //ÓÃÓÚÖØÖÃ½çÃæ
+void restart_grid() {                                              //ç”¨äºé‡ç½®ç•Œé¢
 	for (x = 0; x < GRID_ROWS; x++)
 		for (y = 0; y < GRID_COLS; y++)
 			grid[x][y] = 0;
 }
-void randomize_grid() {                                            //Ëæ»úÉú³ÉÈÎÒâÎ»ÖÃÏ¸°ûµÄ´æ»î×´Ì¬
+void randomize_grid() {                                            //éšæœºç”Ÿæˆä»»æ„ä½ç½®ç»†èƒçš„å­˜æ´»çŠ¶æ€
 	srand((unsigned int)time(NULL));
 	int x, y;
 	for (x = 0; x < GRID_ROWS; x++) {
@@ -83,7 +83,7 @@ void randomize_grid() {                                            //Ëæ»úÉú³ÉÈÎÒ
 			grid[x][y] = rand() % 2;
 	}
 }
-int count_live_cells() {                                          //Í³¼ÆÓĞĞ§ÇøÓòÓĞ¶àÉÙ¸ö»îÏ¸°û
+int count_live_cells() {                                          //ç»Ÿè®¡æœ‰æ•ˆåŒºåŸŸæœ‰å¤šå°‘ä¸ªæ´»ç»†èƒ
 	int x, y, sum = 0;
 	for (x = 0; x < GRID_ROWS; x++) {
 		for (y = 0; y < GRID_COLS; y++)
@@ -91,27 +91,27 @@ int count_live_cells() {                                          //Í³¼ÆÓĞĞ§ÇøÓò
      }
 	return sum;
 }
-int set_cell(int x, int y, int state) {                           //ÉèÖÃÌØ¶¨Ï¸°ûµÄ×´Ì¬
+int set_cell(int x, int y, int state) {                           //è®¾ç½®ç‰¹å®šç»†èƒçš„çŠ¶æ€
 	if (x >= 0 && x < GRID_ROWS && y >= 0 && y < GRID_COLS && (state == 0 || state == 1)) {
 		grid[x][y] = state;
 		return 1;
 	}
 	return 0;
 }
-int reverse_cell(int x, int y£¬int state) {                                 //ÇĞ»»ÌØ¶¨Ï¸°ûµÄ×´Ì¬
+int reverse_cell(int x, int yï¼Œint state) {                                 //åˆ‡æ¢ç‰¹å®šç»†èƒçš„çŠ¶æ€
 	if (x >= 0 && x < GRID_ROWS && y >= 0 && y < GRID_COLS && (state == 0 || state == 1)) {
 		grid[x][y] = !grid[x][y];
 		return 1;
 	}
 	return 0;
 }
-int get_state(int x, int y) {                                            //»ñÈ¡ÌØ¶¨Ï¸°ûµÄ×´Ì¬
+int get_state(int x, int y) {                                            //è·å–ç‰¹å®šç»†èƒçš„çŠ¶æ€
 	if (x >= 0 && x < GRID_ROWS && y >= 0 && y < GRID_COLS) {
 		return grid[x][y];
 	}
 	return 0;
 }
-int is_grid_stable() {                                        //ÖÇÄÜ¼ì²âÓë×Ô¶¯ÔİÍ£,·ÀÖ¹Íø¸ñ½øÈëÎÈ¶¨×´Ì¬£¨¿Õ°×orÑ­»·£©ºóÎŞÒâÒåµÄ×ÊÔ´ÀË·Ñ
+int is_grid_stable() {                                        //æ™ºèƒ½æ£€æµ‹ä¸è‡ªåŠ¨æš‚åœ,é˜²æ­¢ç½‘æ ¼è¿›å…¥ç¨³å®šçŠ¶æ€ï¼ˆç©ºç™½orå¾ªç¯ï¼‰åæ— æ„ä¹‰çš„èµ„æºæµªè´¹
 	static int last_grid[100][100] = { 0 };
 	int changed = 0;
 	int x, y;
@@ -125,17 +125,17 @@ int is_grid_stable() {                                        //ÖÇÄÜ¼ì²âÓë×Ô¶¯Ôİ
 	}
     return !changed;
 }
-void place_pattern(int pattern[][2], int pattern_size, int start_x, int start_y) {  //¿ÉÒÔÊµÏÖÖÇÄÜÍ¼°¸¿â£¬Ô¤Éè³¡¾°
+void place_pattern(int pattern[][2], int pattern_size, int start_x, int start_y) {  //å¯ä»¥å®ç°æ™ºèƒ½å›¾æ¡ˆåº“ï¼Œé¢„è®¾åœºæ™¯
 	int i;
 	for (i = 0; i < pattern_size; i++) {
 		int x = start_x + pattern[i][0];
 		int y = start_y + pattern[i][1];
-		if (x >= 0 && x < GRID_rows && y >= 0 && y < GRID_cols) {
+		if (x >= 0 && x < GRID_ROWS && y >= 0 && y < GRID_COLS) {
 			grid[x][y] = 1;
 		}
 	}
 }
-float get_region_density(int start_x, int start_y, int width, int height) {      //¼ÆËãÏ¸°ûÃÜ¶È£¨ÎÒÒ²²»ÖªµÀÓĞÊ²Ã´ÓÃ´¦£©
+float get_region_density(int start_x, int start_y, int width, int height) {      //è®¡ç®—ç»†èƒå¯†åº¦ï¼ˆæˆ‘ä¹Ÿä¸çŸ¥é“æœ‰ä»€ä¹ˆç”¨å¤„ï¼‰
 	int live_count = 0;
 	int total_cells = 0;
     for (int x = start_x; x < start_x + width && x < GRID_ROWS; x++) {
@@ -153,26 +153,26 @@ float get_region_density(int start_x, int start_y, int width, int height) {     
 	return (float)live_count / total_cells;
 }
 typedef struct {
-	int top, bottom, left, right;  // ËÄ±ß»îÏ¸°ûÊı
+	int top, bottom, left, right;  // å››è¾¹æ´»ç»†èƒæ•°
 } EdgeCounts;
 EdgeCounts get_edge_counts(void) {
-	EdgeCounts counts = { 0, 0, 0, 0 };  // Ò»²½³õÊ¼»¯Îª0
-    /* ¼ÆËãÉÏ±ß½ç£¨µÚ0ĞĞ£© */
-	for (int j = 0; j < GRID_cols; j++) {
+	EdgeCounts counts = { 0, 0, 0, 0 };  // ä¸€æ­¥åˆå§‹åŒ–ä¸º0
+    /* è®¡ç®—ä¸Šè¾¹ç•Œï¼ˆç¬¬0è¡Œï¼‰ */
+	for (int j = 0; j < GRID_COLS; j++) {
 		counts.top += grid[0][j];
 	}
-    /* ¼ÆËãÏÂ±ß½ç£¨×îºóÒ»ĞĞ£© */
-	int last_row = GRID_rows - 1;
-	for (int j = 0; j < GRID_cols; j++) {
+    /* è®¡ç®—ä¸‹è¾¹ç•Œï¼ˆæœ€åä¸€è¡Œï¼‰ */
+	int last_row = GRID_ROWS - 1;
+	for (int j = 0; j < GRID_ROWS; j++) {
 		counts.bottom += grid[last_row][j];
 	}
-    /* ¼ÆËã×ó±ß½ç£¨µÚ0ÁĞ£© */
-	for (int i = 0; i < GRID_rows; i++) {
+    /* è®¡ç®—å·¦è¾¹ç•Œï¼ˆç¬¬0åˆ—ï¼‰ */
+	for (int i = 0; i < GRID_ROWS; i++) {
 		counts.left += grid[i][0];
 	}
-    /* ¼ÆËãÓÒ±ß½ç£¨×îºóÒ»ÁĞ£© */
-	int last_col = GRID_cols - 1;
-	for (int i = 0; i < GRID_rows; i++) {
+    /* è®¡ç®—å³è¾¹ç•Œï¼ˆæœ€åä¸€åˆ—ï¼‰ */
+	int last_col = GRID_COLS - 1;
+	for (int i = 0; i < GRID_ROWS; i++) {
 		counts.right += grid[i][last_col];
 	}
     return counts;
