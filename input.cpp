@@ -1,186 +1,99 @@
 ﻿#include "global.h"
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS // 防止 fopen 报错
 
-#include<graphics.h>
-#include<conio.h>
-#include<windows.h>
-#include<stdio.h>
-#include<string.h>
-#include"core.h"
-#include"render.h"
+#include <graphics.h>
+#include <conio.h>
+#include <windows.h>
+#include <stdio.h>
+#include <string.h>
+#include "core.h"
+#include "render.h"
 
-extern char message[64] = {0};
-extern int message_timer=0;
-
-//      戏 
+// 存档功能
 void saveGame(void)
 {
     FILE* fp = fopen("save.txt", "w");
-    if (fp == NULL)
-    {
-        strcpy(message, "Save Failed!");
-        message_timer = 20;
-        return;
-    }
+    if (fp == NULL) return; // 简单失败处理
 
-    //    叽 
+    // 1. 先写入当前的尺寸配置
     fprintf(fp, "%d %d\n", GRID_ROWS, GRID_COLS);
 
-    //细    状态
-    for (int i = 0; i < GRID_ROWS; i++)
-    {
-        for (int j = 0; j < GRID_COLS; j++)
-        {
+    // 2. 写入矩阵
+    for (int i = 0; i < GRID_ROWS; i++) {
+        for (int j = 0; j < GRID_COLS; j++) {
             fprintf(fp, "%d ", grid[i][j]);
         }
         fprintf(fp, "\n");
     }
-
     fclose(fp);
-
-    //    晒 
-    strcpy(message, "Saved!");
-    message_timer = 20;
 }
 
-//   save.txt  募       戏状态
-
+// 读档功能
 void loadGame(void)
 {
     FILE* fp = fopen("save.txt", "r");
-    if (fp == NULL)
-    {
-        strcpy(message, "Load Failed!");
-        message_timer = 20;
-        return;
-    }
+    if (fp == NULL) return;
 
-    int rows, cols;
+    int r, c;
+    // 1. 读取保存的尺寸
+    fscanf(fp, "%d %d", &r, &c);
 
-    //  取    叽 
-    fscanf(fp, "%d %d", &rows, &cols);
+    // 2. 安全措施：先清空当前地图，防止残影
+    restart_grid(); // 调用 core 里的清空函数
 
-    //  取细  状态
-    for (int i = 0; i < rows && i < GRID_ROWS; i++)
-    {
-        for (int j = 0; j < cols && j < GRID_COLS; j++)
-        {
-            fscanf(fp, "%d", &grid[i][j]);
+    // 3. 读取数据
+    for (int i = 0; i < r; i++) {
+        for (int j = 0; j < c; j++) {
+            int val;
+            fscanf(fp, "%d", &val);
+            // 只有当坐标在当前 grid 范围内时才赋值
+            if (i < GRID_ROWS && j < GRID_COLS) {
+                grid[i][j] = val;
+            }
         }
     }
-
     fclose(fp);
-
-    //  示   爻晒   示
-    strcpy(message, "Loaded!");
-    message_timer = 20;
+    paused = 1; // 读档后暂停方便查看
 }
 
-//       氪?                                                                              
-
+// 键盘处理
 void handleKeyboard(void)
 {
-    if (!_kbhit())
-    {
-        return;
+    // 功能键检测
+    if (GetAsyncKeyState('H') & 0x8000) { show_heatmap = !show_heatmap; Sleep(200); }
+    if (GetAsyncKeyState('V') & 0x8000) { show_ai_vision = !show_ai_vision; Sleep(200); }
+    if (GetAsyncKeyState('F') & 0x8000) {
+        if (speed_level == 1) speed_level = 2;
+        else if (speed_level == 2) speed_level = 5;
+        else speed_level = 1;
+        Sleep(200);
     }
+
+    if (!_kbhit()) return;
 
     char ch = _getch();
-
-    switch (ch)
-    {
-        // 崭   停/    
-    case ' ':
-        paused = !paused;
-        if (paused)
-        {
-            strcpy(message, "Paused");
-        }
-        else
-        {
-            strcpy(message, "Running");
-        }
-        message_timer = 15;
-        break;
-
-        //R         
-    case 'r':
-    case 'R':
-        randomize_grid();
-        strcpy(message, "Randomized!");
-        message_timer = 20;
-        break;
-
-        //C     
-    case 'c':
-    case 'C':
-        restart_grid();
-        strcpy(message, "Cleared!");
-        message_timer = 20;
-        break;
-
-        //S      
-    case 's':
-    case 'S':
-        saveGame();
-        break;
-
-        //L      
-    case 'l':
-    case 'L':
-        loadGame();
-        break;
-
-        //ESC   顺   戏
-    case 27:
-        EndBatchDraw();
-        closegraph();
-        exit(0);
-        break;
-
-    default:
-        break;
+    switch (ch) {
+    case ' ': paused = !paused; break;
+    case 'r': case 'R': randomize_grid(); break;
+    case 'c': case 'C': restart_grid(); break;
+    case 's': case 'S': saveGame(); break;
+    case 'l': case 'L': loadGame(); break;
+    case 27: EndBatchDraw(); closegraph(); exit(0); break;
     }
 }
 
-//      氪?                                                                                  
-//    幕    转  为          
-int screenToGridCol(int screen_x)
-{
-    int col = (screen_x - GRID_OFFSET_X) / CELL_SIZE;
-    if (col < 0 || col >= GRID_COLS)
-    {
-        return -1;
-    }
-    return col;
-}
-
-//    幕    转  为          
-int screenToGridRow(int screen_y)
-{
-    int row = (screen_y - GRID_OFFSET_Y) / CELL_SIZE;
-    if (row < 0 || row >= GRID_ROWS)
-    {
-        return -1;
-    }
-    return row;
-}
-
-//      
+// 鼠标处理 (关键修正：偏移量 offset)
 void handleMouse(void)
 {
-    while (MouseHit())
-    {
+    while (MouseHit()) {
         MOUSEMSG msg = GetMouseMsg();
+        if (msg.uMsg == WM_LBUTTONDOWN) {
+            // 【核心修正】：减去偏移量！
+            // 否则你看着点的是格子，实际上点歪了
+            int col = (msg.x - GRID_OFFSET_X) / CELL_SIZE;
+            int row = (msg.y - GRID_OFFSET_Y) / CELL_SIZE;
 
-        if (msg.uMsg == WM_LBUTTONDOWN)
-        {
-            int col = screenToGridCol(msg.x);
-            int row = screenToGridRow(msg.y);
-
-            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS)
-            {
-                //  谢 细  状态
+            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
                 grid[row][col] = !grid[row][col];
             }
         }

@@ -1,91 +1,141 @@
-#include "global.h"
+#define _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #include <graphics.h>
 #include <stdio.h>
-#include <time.h>
-
- // 引入队友的“契约”
+#include "global.h"
 #include "core.h"
 #include "render.h"
 #include "input.h"
 
-// ============================================
-// 全局变量定义 (实体在这里！)
-// ============================================
+// 全局变量定义
 int grid[100][100] = { 0 };
-int GRID_ROWS = 60;
-int GRID_COLS = 80;
-int paused = 1; // 1=暂停, 0=运行
+int paused = 1;
 int generation = 0;
 
-// 定义存档文件名
-const char* SAVE_FILE = "save.txt";
+// 窗口参数
+int GRID_ROWS = 60;
+int GRID_COLS = 80;
+int CELL_SIZE = 10;
+int WINDOW_WIDTH = 800;
+int WINDOW_HEIGHT = 600;
+int GRID_OFFSET_X = 0;
+int GRID_OFFSET_Y = 50; // 给 UI 留 50 像素高度
 
-// ============================================
-// 系统功能：存档 (Save Game)
-// 格式：简单文本，每一行存一个格子：行 列 状态
-// 或者更紧凑：直接把 0/1 矩阵写进去
-// ============================================/*
+// 开关
+int show_heatmap = 0;
+int show_ai_vision = 0;
+int speed_level = 1;
+int fullscreen_mode = 0;
 
- 
-// ============================================
-// 主程序入口
-// ============================================
+// 历史数据
+int population_history[HISTORY_LEN] = { 0 };
+int history_cursor = 0;
+
+// ----------------------------------------------
+// 读取配置
+// ----------------------------------------------
+void load_config() {
+    FILE* fp = fopen("config.ini", "r");
+    if (fp == NULL) return;
+    char line[100], key[50];
+    int value;
+    while (fgets(line, sizeof(line), fp)) {
+        if (sscanf(line, "%[^=]=%d", key, &value) == 2) {
+            if (strcmp(key, "width") == 0) WINDOW_WIDTH = value;
+            else if (strcmp(key, "height") == 0) WINDOW_HEIGHT = value;
+            else if (strcmp(key, "rows") == 0) GRID_ROWS = value;
+            else if (strcmp(key, "cols") == 0) GRID_COLS = value;
+            else if (strcmp(key, "cell_size") == 0) CELL_SIZE = value;
+        }
+    }
+    fclose(fp);
+    if (GRID_ROWS > 100) GRID_ROWS = 100;
+    if (GRID_COLS > 100) GRID_COLS = 100;
+}
+
+// ----------------------------------------------
+// 记录数据
+// ----------------------------------------------
+void record_population() {
+    int pop = 0;
+    for (int i = 0; i < GRID_ROWS; i++)
+        for (int j = 0; j < GRID_COLS; j++) if (grid[i][j]) pop++;
+
+    population_history[history_cursor] = pop;
+    history_cursor = (history_cursor + 1) % HISTORY_LEN;
+}
+
+// ----------------------------------------------
+// 自适应网格逻辑
+// ----------------------------------------------
+void resize_grid() {
+    int w = getwidth();
+    int h = getheight();
+    WINDOW_WIDTH = w; WINDOW_HEIGHT = h;
+
+    int new_cols = w / CELL_SIZE;
+    int new_rows = (h - GRID_OFFSET_Y) / CELL_SIZE;
+
+    if (new_cols > 100) new_cols = 100;
+    if (new_rows > 100) new_rows = 100;
+
+    GRID_COLS = new_cols;
+    GRID_ROWS = new_rows;
+}
+
+// ----------------------------------------------
+// 主入口
+// ----------------------------------------------
 int main() {
-    // 1. 初始化窗口
-    initgraph(800, 600);
+    load_config();
 
-    // 设置背景色（可选，根据 Render 组的设计）
-    setbkcolor(BLACK);
-    cleardevice();
+    // 1. 初始化窗口 (允许System Menu)
+    HWND hwnd = initgraph(WINDOW_WIDTH, WINDOW_HEIGHT, 1);
 
-    // 开启批量绘图
+    // 2. 【核心】激活“最大化按钮”和“调整边框”
+    // 获取当前窗口样式
+    LONG style = GetWindowLong(hwnd, GWL_STYLE);
+    // 加上“最大化按钮”和“可拖拽边框”属性
+    style = style | WS_MAXIMIZEBOX | WS_THICKFRAME;
+    // 应用样式
+    SetWindowLong(hwnd, GWL_STYLE, style);
+    // 刷新窗口框架 (必做，否则按钮不出来)
+    SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+    SetWindowText(hwnd, "Conway's Game of Life - Final");
     BeginBatchDraw();
 
-    // 2. 游戏主循环
-    while (true) {
+    int last_w = WINDOW_WIDTH;
+    int last_h = WINDOW_HEIGHT;
 
-        // --- Input 阶段 ---
+    while (true) {
+        // --- 检测窗口变化 ---
+        int w = getwidth();
+        int h = getheight();
+        if (w != last_w || h != last_h) {
+            resize_grid();
+            last_w = w; last_h = h;
+            cleardevice();
+        }
+
         handleInput();
 
-        // 扩展：System 组额外接管了 S 和 L 键的逻辑
-        // 因为 handleInput 主要是处理游戏内的交互
-        // 存档读档通常是 System 级的指令
-        if (GetAsyncKeyState('S') & 0x8000) {
-            saveGame();
-        }
-        if (GetAsyncKeyState('L') & 0x8000) {
-            loadGame();
-        }
-
-        // --- Core 阶段 ---
         if (paused == 0) {
             next_Generation();
-			generation++;
-            Sleep(100); // 控制演化速度
+            generation++;
+            record_population();
+
+            int sleep = 100 / speed_level;
+            Sleep(sleep > 0 ? sleep : 0);
         }
         else {
-            Sleep(10);  // 暂停时省点 CPU
+            Sleep(10);
         }
 
-        // --- Render 阶段 ---
         cleardevice();
-
-        render( grid, GRID_ROWS, GRID_COLS, generation, paused); // 画网格和细胞
-
-        // System 组负责绘制 UI 覆盖层 (Overlay)
-        settextcolor(WHITE);
-        setbkmode(TRANSPARENT);
-        if (paused) {
-            outtextxy(10, 10, "PAUSED - [Space] Run | [L] Load | [S] Save | [R] Reset");
-        }
-        else {
-            outtextxy(10, 10, "RUNNING - [Space] Pause");
-        }
-
+        render();
         FlushBatchDraw();
     }
-
     EndBatchDraw();
     closegraph();
     return 0;
