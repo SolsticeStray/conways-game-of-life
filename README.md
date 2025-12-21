@@ -110,7 +110,7 @@ cell_size=10
 👨‍💻 团队成员 (Credits)
 本项目由大一 C 语言项目小组开发完成：
 
-System Brain (Leader): [Solstice] - 负责系统架构、主循环、数据分析、整合、热力图算法、CV 识别绘制。
-Visual Artist: [James] - 负责 Render 渲染管线。
-Logic Core: [Snow] - 负责 Core 核心演化算法、数据结构。
-Input Handler: [Flynn] - 负责外设交互、文件 I/O、快捷键逻辑。
+- System Brain (Leader): [Solstice] - 负责系统架构、主循环、数据分析、整合、热力图算法、CV 识别绘制。
+- Visual Artist: [James] - 负责 Render 渲染管线。
+- Logic Core: [Snow] - 负责 Core 核心演化算法、数据结构。
+- Input Handler: [Flynn] - 负责外设交互、文件 I/O、快捷键逻辑。
