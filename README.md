@@ -1,4 +1,4 @@
-# 🧬 Conway's Game of Life - Ultimate AI Edition
+# 🧬 Conway's Game of Life - Final Edition
 
 ![Project Status](https://img.shields.io/badge/Status-Completed-success)
 ![Language](https://img.shields.io/badge/Language-C%2FC%2B%2B-blue)
