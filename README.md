@@ -48,11 +48,11 @@
 ## 📸 运行截图 (Screenshots)
 
 ### 1. 智能识别模式 (Computer Vision Mode)
-![CV Vision Demo](CV Vision Demo.png)
+![CV Vision Demo](CV_Vision_Demo.png)
 *系统自动识别并标注了画面中的 Block 和 Oscillator 结构。*
 
 ### 2. 热力图模式 (Heatmap Mode)
-![Heatmap Demo](Heatmap Demo.png)
+![Heatmap Demo](Heatmap_Demo.png)
 *通过颜色区分细胞的生存状态，直观展示群落的内部压力。*
 
 ---
